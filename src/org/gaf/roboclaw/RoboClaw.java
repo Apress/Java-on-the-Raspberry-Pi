@@ -365,7 +365,7 @@ public class RoboClaw implements AutoCloseable {
      * @return true if communication successful
      */   
     public boolean setM2VelocityPID(VelocityPID velocityPID) {     
-        return setVelocityPID(Commands.SETM1PID, velocityPID);       
+        return setVelocityPID(Commands.SETM2PID, velocityPID);       
     }
     
     /**
