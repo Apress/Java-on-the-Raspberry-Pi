@@ -1,0 +1,103 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.diozero</groupId>
+    <artifactId>diozero-bom</artifactId>
+    <version>1.3.0</version>
+  </parent>
+
+  <groupId>org.gaf</groupId>
+  <artifactId>led-test</artifactId>
+  <version>1.0</version>
+  <name>led-test</name>
+  <packaging>jar</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.diozero</groupId>
+      <artifactId>diozero-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.gaf</groupId>
+      <artifactId>led</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.diozero</groupId>
+      <artifactId>diozero-provider-pigpio</artifactId>
+      <version>${diozero.version}</version>
+    </dependency>
+  </dependencies>
+    
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <transformers>
+                <transformer implementation=
+             "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>
+                    org.gaf.led.test.TestLED
+                  </mainClass>
+                </transformer>
+              </transformers>
+              <artifactSet>
+                <!--
+                | Exclude the pigpio provider 
+                | and dependencies from
+                | the single JAR as we will run 
+                | this on the Pi itself
+                | using the default built-in provider.
+                | -->
+                <excludes>
+                  <exclude>
+                    com.diozero:diozero-provider-pigpio
+                  </exclude>
+                  <exclude>
+                    uk.pigpioj:pigpioj-java
+                  </exclude>
+                  <exclude>io.netty:netty-all</exclude>
+                </excludes>
+              </artifactSet>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <executable>sh</executable>
+          <arguments>
+            <argument>
+              ${project.basedir}/remote_run.sh
+            </argument>
+            <argument>
+              ${project.artifactId}-${project.version}.jar
+            </argument>
+            <argument>pi@192.168.1.97</argument>
+            <argument>/home/pi</argument>
+          </arguments>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build> 
+</project>
